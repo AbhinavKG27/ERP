@@ -18,6 +18,14 @@ public class AppProperties {
     private Promotion promotion = new Promotion();
     private Library library = new Library();
 
+    // Add this field to AppProperties.java
+    private Cors cors = new Cors();
+
+    @Data
+    public static class Cors {
+        private String allowedOrigins;
+    }
+
     @Data
     public static class Jwt {
         private String secret;
