@@ -12,7 +12,6 @@ public class SecurityService {
 
     private final UserRepository userRepository;
 
-    // ── Get currently authenticated user ─────────────────────
     public CustomUserDetails getCurrentUser() {
         Authentication auth =
             SecurityContextHolder.getContext().getAuthentication();
@@ -23,16 +22,27 @@ public class SecurityService {
         return getCurrentUser().getId();
     }
 
-    // ── isOwnStudent will be properly wired in Phase 5
-    // ── once StudentRepository exists
     public boolean isOwnStudent(Long studentId) {
-        // Placeholder — full implementation in Phase 5
-        // For now returns false to prevent accidental access
-        return false;
+        try {
+            Long currentUserId = getCurrentUserId();
+            return userRepository.findById(currentUserId)
+                .map(u -> {
+                    // Will be properly implemented in Phase 5
+                    // when Student-User link is confirmed
+                    return false;
+                })
+                .orElse(false);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
-    // ── Check if current user owns a user record ──────────────
     public boolean isOwnUser(Long userId) {
-        return getCurrentUserId().equals(userId);
+        try {
+            Long currentId = getCurrentUserId();
+            return currentId != null && currentId.equals(userId);
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

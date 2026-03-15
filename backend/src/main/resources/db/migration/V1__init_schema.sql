@@ -50,7 +50,9 @@ CREATE TABLE programs (
     duration_years  INT          NOT NULL,
     total_semesters INT          NOT NULL,
     is_active       BOOLEAN      NOT NULL DEFAULT TRUE,
-    created_at      TIMESTAMP    NOT NULL DEFAULT NOW()
+    created_at      TIMESTAMP    NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP    NOT NULL DEFAULT NOW(),
+    created_by      BIGINT
 );
 
 CREATE TABLE batches (
@@ -61,6 +63,8 @@ CREATE TABLE batches (
     section         VARCHAR(5),
     is_active       BOOLEAN  NOT NULL DEFAULT TRUE,
     created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    created_by      BIGINT,
     UNIQUE (program_id, join_year, section)
 );
 

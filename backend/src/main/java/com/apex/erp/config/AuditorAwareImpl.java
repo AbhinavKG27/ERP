@@ -13,13 +13,23 @@ public class AuditorAwareImpl implements AuditorAware<Long> {
 
     @Override
     public Optional<Long> getCurrentAuditor() {
+
         Authentication auth =
-            SecurityContextHolder.getContext().getAuthentication();
+                SecurityContextHolder.getContext().getAuthentication();
+
         if (auth == null || !auth.isAuthenticated()
                 || "anonymousUser".equals(auth.getPrincipal())) {
             return Optional.empty();
         }
-        CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
-        return Optional.of(userDetails.getId());
+
+        try {
+            CustomUserDetails userDetails =
+                    (CustomUserDetails) auth.getPrincipal();
+
+            return Optional.ofNullable(userDetails.getId());
+
+        } catch (ClassCastException e) {
+            return Optional.empty();
+        }
     }
 }
