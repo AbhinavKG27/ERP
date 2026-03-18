@@ -75,7 +75,7 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder(12);
     }
 
-    // ── Inline CORS config to avoid circular bean dependency ──
+    
     @Bean
     public org.springframework.web.cors.CorsConfigurationSource
             corsConfigurationSource() {
