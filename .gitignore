@@ -1,14 +1,111 @@
-# Maven
-target/
+# ==============================
 
-# logs
+# ROOT LEVEL
+
+# ==============================
+
+.env
+.env.*
+*.log
 logs/
+*.tmp
+*.temp
 
-# OS
+# OS files
+
 .DS_Store
 Thumbs.db
 
-# IDE
+# IDE / Editor
+
 .idea/
 .vscode/
 *.iml
+*.swp
+*.swo
+
+# ==============================
+
+# BACKEND (SPRING BOOT / MAVEN)
+
+# ==============================
+
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+
+# Maven wrapper logs
+
+backend/mvnw.cmd
+backend/mvnw
+
+# Generated files
+
+backend/*.log
+
+# ==============================
+
+# DATABASE / MIGRATIONS (KEEP THESE)
+
+# ==============================
+
+# IMPORTANT: DO NOT IGNORE MIGRATIONS
+
+!backend/src/main/resources/db/migration/*.sql
+
+# ==============================
+
+# FRONTEND (REACT + VITE)
+
+# ==============================
+
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.cache/
+
+# Logs
+
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+# Env files
+
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+
+# Build artifacts
+
+frontend/build/
+
+# ==============================
+
+# TEST / COVERAGE
+
+# ==============================
+
+coverage/
+*.lcov
+
+# ==============================
+
+# SECURITY (VERY IMPORTANT)
+
+# ==============================
+
+*.pem
+*.key
+*.crt
+*.p12
+
+# ==============================
+
+# MISC
+
+# ==============================
+
+*.zip
+*.tar
+*.gz
+*.rar
