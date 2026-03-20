@@ -1,0 +1,39 @@
+export const ROLES = {
+  ADMIN:         'ADMIN',
+  HOD:           'HOD',
+  FACULTY:       'FACULTY',
+  STUDENT:       'STUDENT',
+  FINANCE:       'FINANCE',
+  LIBRARIAN:     'LIBRARIAN',
+  HOSTEL_WARDEN: 'HOSTEL_WARDEN',
+  COE:           'COE',
+}
+
+export const ATTENDANCE_STATUS = {
+  PRESENT: 'PRESENT',
+  ABSENT:  'ABSENT',
+  OD:      'OD',
+  ML:      'ML',
+}
+
+export const FEE_STATUS = {
+  PENDING:  'PENDING',
+  PARTIAL:  'PARTIAL',
+  PAID:     'PAID',
+  OVERDUE:  'OVERDUE',
+}
+
+export const GRIEVANCE_STATUS = {
+  SUBMITTED:  'SUBMITTED',
+  ASSIGNED:   'ASSIGNED',
+  ESCALATED:  'ESCALATED',
+  RESOLVED:   'RESOLVED',
+}
+
+export const ACADEMIC_YEARS = [
+  '2024-25',
+  '2025-26',
+  '2026-27',
+]
+
+export const SEMESTERS = [1, 2, 3, 4, 5, 6, 7, 8]
