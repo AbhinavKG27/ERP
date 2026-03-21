@@ -2,47 +2,56 @@ import axios from 'axios'
 
 const api = axios.create({
   baseURL: '/api/v1',
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  headers: { 'Content-Type': 'application/json' },
 })
 
-// Request interceptor — attach JWT token
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('accessToken')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
-    }
-    return config
-  },
-  (error) => Promise.reject(error)
-)
+// Read token from Zustand persisted storage
+const getToken = () => {
+  try {
+    const raw = localStorage.getItem('apex-auth')
+    if (!raw) return null
+    const parsed = JSON.parse(raw)
+    return parsed?.state?.accessToken || null
+  } catch {
+    return null
+  }
+}
 
-// Response interceptor — handle 401
+api.interceptors.request.use((config) => {
+  const token = getToken()
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+}, (error) => Promise.reject(error))
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const original = error.config
-
     if (error.response?.status === 401
         && !original._retry) {
       original._retry = true
-
       try {
+        const raw = localStorage.getItem('apex-auth')
+        const parsed = JSON.parse(raw)
         const refreshToken =
-          localStorage.getItem('refreshToken')
+          parsed?.state?.refreshToken
         const res = await axios.post(
           '/api/v1/auth/refresh',
           { refreshToken })
-
         const newToken = res.data.data.accessToken
-        localStorage.setItem('accessToken', newToken)
+
+        // Update stored token
+        parsed.state.accessToken = newToken
+        localStorage.setItem('apex-auth',
+          JSON.stringify(parsed))
+
         original.headers.Authorization =
           `Bearer ${newToken}`
         return api(original)
       } catch {
-        localStorage.clear()
+        localStorage.removeItem('apex-auth')
         window.location.href = '/login'
       }
     }
