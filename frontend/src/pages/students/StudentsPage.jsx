@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient }
+import { useQuery, useQueryClient }
   from '@tanstack/react-query'
 import {
   Plus, Search, Filter, Download,
@@ -32,7 +32,6 @@ export default function StudentsPage() {
   const [page,         setPage]         = useState(0)
   const [showAdd,      setShowAdd]      = useState(false)
   const [selectedStudent, setSelected] = useState(null)
-
   const queryClient = useQueryClient()
 
   const { data, isLoading, isError } = useQuery({

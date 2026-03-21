@@ -5,10 +5,12 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 })
 
+const AUTH_STORAGE_KEY = 'auth-storage'
+
 // Read token from Zustand persisted storage
 const getToken = () => {
   try {
-    const raw = localStorage.getItem('apex-auth')
+    const raw = localStorage.getItem(AUTH_STORAGE_KEY)
     if (!raw) return null
     const parsed = JSON.parse(raw)
     return parsed?.state?.accessToken || null
@@ -33,7 +35,7 @@ api.interceptors.response.use(
         && !original._retry) {
       original._retry = true
       try {
-        const raw = localStorage.getItem('apex-auth')
+        const raw = localStorage.getItem(AUTH_STORAGE_KEY)
         const parsed = JSON.parse(raw)
         const refreshToken =
           parsed?.state?.refreshToken
@@ -44,14 +46,14 @@ api.interceptors.response.use(
 
         // Update stored token
         parsed.state.accessToken = newToken
-        localStorage.setItem('apex-auth',
+        localStorage.setItem(AUTH_STORAGE_KEY,
           JSON.stringify(parsed))
 
         original.headers.Authorization =
           `Bearer ${newToken}`
         return api(original)
       } catch {
-        localStorage.removeItem('apex-auth')
+        localStorage.removeItem(AUTH_STORAGE_KEY)
         window.location.href = '/login'
       }
     }

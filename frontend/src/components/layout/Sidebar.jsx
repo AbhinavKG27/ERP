@@ -88,7 +88,9 @@ export default function Sidebar({ open, onClose }) {
   const handleLogout = async () => {
     try {
       if (user?.id) await authApi.logout(user.id)
-    } catch {}
+    } catch {
+      // Ignore API logout failures and clear local auth state.
+    }
     logout()
     navigate('/login')
     toast.success('Logged out successfully')

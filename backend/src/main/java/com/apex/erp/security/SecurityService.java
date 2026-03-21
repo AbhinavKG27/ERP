@@ -27,8 +27,6 @@ public class SecurityService {
             Long currentUserId = getCurrentUserId();
             return userRepository.findById(currentUserId)
                 .map(u -> {
-                    // Will be properly implemented in Phase 5
-                    // when Student-User link is confirmed
                     return false;
                 })
                 .orElse(false);

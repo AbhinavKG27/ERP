@@ -1,4 +1,3 @@
-import { useQuery } from '@tanstack/react-query'
 import {
   Users, UserCheck, ClipboardCheck,
   CreditCard, TrendingUp, BookOpen,
@@ -8,50 +7,55 @@ import useAuthStore from '../../store/authStore'
 import { ROLES } from '../../utils/constants'
 import { formatCurrency } from '../../utils/helpers'
 
-const StatCard = ({ icon: Icon, label,
-  value, sub, color, bg }) => (
-  <div className="bg-white rounded-2xl p-5
-    border border-slate-100 shadow-sm
-    hover:shadow-md transition-shadow">
-    <div className="flex items-start justify-between">
-      <div>
-        <p className="text-sm text-slate-500
-          font-medium">{label}</p>
-        <p className="text-3xl font-bold
-          text-slate-800 mt-1">{value}</p>
-        {sub && (
-          <p className="text-xs text-slate-400
-            mt-1">{sub}</p>
-        )}
-      </div>
-      <div className={`w-12 h-12 ${bg} rounded-xl
-        flex items-center justify-center`}>
-        <Icon size={22} className={color} />
-      </div>
-    </div>
-  </div>
-)
-
-const QuickAction = ({ icon: Icon, label,
-  description, onClick, color }) => (
-  <button
-    onClick={onClick}
-    className="bg-white rounded-2xl p-5
+const StatCard = ({ icon, label, value, sub, color, bg }) => {
+  const IconComponent = icon
+  return (
+    <div className="bg-white rounded-2xl p-5
       border border-slate-100 shadow-sm
-      hover:shadow-md hover:border-blue-200
-      transition-all text-left w-full group">
-    <div className={`w-10 h-10 ${color}
-      rounded-xl flex items-center
-      justify-center mb-3 group-hover:scale-110
-      transition-transform`}>
-      <Icon size={20} className="text-white" />
+      hover:shadow-md transition-shadow">
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-sm text-slate-500
+            font-medium">{label}</p>
+          <p className="text-3xl font-bold
+            text-slate-800 mt-1">{value}</p>
+          {sub && (
+            <p className="text-xs text-slate-400
+              mt-1">{sub}</p>
+          )}
+        </div>
+        <div className={`w-12 h-12 ${bg} rounded-xl
+          flex items-center justify-center`}>
+          <IconComponent size={22} className={color} />
+        </div>
+      </div>
     </div>
-    <p className="font-semibold text-slate-700
-      text-sm">{label}</p>
-    <p className="text-xs text-slate-400
-      mt-1">{description}</p>
-  </button>
-)
+  )
+}
+
+const QuickAction = ({ icon, label,
+  description, onClick, color }) => {
+  const IconComponent = icon
+  return (
+    <button
+      onClick={onClick}
+      className="bg-white rounded-2xl p-5
+        border border-slate-100 shadow-sm
+        hover:shadow-md hover:border-blue-200
+        transition-all text-left w-full group">
+      <div className={`w-10 h-10 ${color}
+        rounded-xl flex items-center
+        justify-center mb-3 group-hover:scale-110
+        transition-transform`}>
+        <IconComponent size={20} className="text-white" />
+      </div>
+      <p className="font-semibold text-slate-700
+        text-sm">{label}</p>
+      <p className="text-xs text-slate-400
+        mt-1">{description}</p>
+    </button>
+  )
+}
 
 export default function DashboardHome() {
   const { user } = useAuthStore()
@@ -307,4 +311,3 @@ export default function DashboardHome() {
     </div>
   )
 }
-

@@ -1,26 +1,29 @@
 import {
-  X, GraduationCap, Phone, Mail,
+  X, Phone, Mail,
   Hash, Calendar, User, MapPin,
   Users, Droplets
 } from 'lucide-react'
 import { formatDate, getInitials }
   from '../../utils/helpers'
 
-const InfoRow = ({ icon: Icon, label, value }) => (
-  <div className="flex items-start gap-3 py-3
-    border-b border-slate-50 last:border-0">
-    <div className="w-8 h-8 rounded-lg bg-slate-100
-      flex items-center justify-center flex-shrink-0">
-      <Icon size={14} className="text-slate-500" />
+const InfoRow = ({ icon, label, value }) => {
+  const IconComponent = icon
+  return (
+    <div className="flex items-start gap-3 py-3
+      border-b border-slate-50 last:border-0">
+      <div className="w-8 h-8 rounded-lg bg-slate-100
+        flex items-center justify-center flex-shrink-0">
+        <IconComponent size={14} className="text-slate-500" />
+      </div>
+      <div>
+        <p className="text-xs text-slate-400">{label}</p>
+        <p className="text-sm font-medium text-slate-700 mt-0.5">
+          {value || '—'}
+        </p>
+      </div>
     </div>
-    <div>
-      <p className="text-xs text-slate-400">{label}</p>
-      <p className="text-sm font-medium text-slate-700 mt-0.5">
-        {value || '—'}
-      </p>
-    </div>
-  </div>
-)
+  )
+}
 
 export default function StudentDetailModal({
   student, onClose
