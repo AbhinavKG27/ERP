@@ -1,89 +1,112 @@
+import { useNavigate } from 'react-router-dom'
 import {
   Users, UserCheck, ClipboardCheck,
-  CreditCard, TrendingUp, BookOpen,
-  GraduationCap, AlertCircle,
+  CreditCard, BookOpen, GraduationCap,
+  AlertCircle, TrendingUp, Bell,
+  MessageSquare, Home, Library,
 } from 'lucide-react'
 import useAuthStore from '../../store/authStore'
 import { ROLES } from '../../utils/constants'
 import { formatCurrency } from '../../utils/helpers'
 
-const StatCard = ({ icon, label, value, sub, color, bg }) => {
-  const IconComponent = icon
-  return (
-    <div className="bg-white rounded-2xl p-5
-      border border-slate-100 shadow-sm
-      hover:shadow-md transition-shadow">
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-sm text-slate-500
-            font-medium">{label}</p>
-          <p className="text-3xl font-bold
-            text-slate-800 mt-1">{value}</p>
-          {sub && (
-            <p className="text-xs text-slate-400
-              mt-1">{sub}</p>
-          )}
-        </div>
-        <div className={`w-12 h-12 ${bg} rounded-xl
-          flex items-center justify-center`}>
-          <IconComponent size={22} className={color} />
-        </div>
+const StatCard = ({
+  icon: Icon, label, value,
+  sub, color, bg
+}) => (
+  <div className="bg-white rounded-2xl p-5
+    border border-slate-100 shadow-sm
+    hover:shadow-md transition-shadow">
+    <div className="flex items-start
+      justify-between">
+      <div className="min-w-0 flex-1">
+        <p className="text-sm text-slate-500
+          font-medium">{label}</p>
+        <p className="text-3xl font-bold
+          text-slate-800 mt-1">{value}</p>
+        {sub && (
+          <p className="text-xs text-slate-400
+            mt-1 truncate">{sub}</p>
+        )}
+      </div>
+      <div className={`w-12 h-12 ${bg}
+        rounded-xl flex items-center
+        justify-center flex-shrink-0 ml-3`}>
+        <Icon size={22} className={color} />
       </div>
     </div>
-  )
-}
+  </div>
+)
 
-const QuickAction = ({ icon, label,
-  description, onClick, color }) => {
-  const IconComponent = icon
+const QuickAction = ({
+  icon: Icon, label,
+  description, path, color
+}) => {
+  const navigate = useNavigate()
   return (
     <button
-      onClick={onClick}
+      onClick={() => navigate(path)}
       className="bg-white rounded-2xl p-5
         border border-slate-100 shadow-sm
         hover:shadow-md hover:border-blue-200
         transition-all text-left w-full group">
       <div className={`w-10 h-10 ${color}
         rounded-xl flex items-center
-        justify-center mb-3 group-hover:scale-110
+        justify-center mb-3
+        group-hover:scale-110
         transition-transform`}>
-        <IconComponent size={20} className="text-white" />
+        <Icon size={20} className="text-white" />
       </div>
-      <p className="font-semibold text-slate-700
-        text-sm">{label}</p>
-      <p className="text-xs text-slate-400
-        mt-1">{description}</p>
+      <p className="font-semibold
+        text-slate-700 text-sm">
+        {label}
+      </p>
+      <p className="text-xs text-slate-400 mt-1">
+        {description}
+      </p>
     </button>
   )
 }
 
 export default function DashboardHome() {
   const { user } = useAuthStore()
-  const isAdmin  = user?.role === ROLES.ADMIN
+  const isAdmin   = user?.role === ROLES.ADMIN
   const isStudent = user?.role === ROLES.STUDENT
   const isFaculty = user?.role === ROLES.FACULTY
+  const isHod     = user?.role === ROLES.HOD
+  const isFinance = user?.role === ROLES.FINANCE
+  const isLibrarian =
+    user?.role === ROLES.LIBRARIAN
+  const isWarden  =
+    user?.role === ROLES.HOSTEL_WARDEN
 
   return (
     <div className="space-y-6">
 
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-slate-800">
-          Good morning, {user?.fullName}! 👋
-        </h1>
-        <p className="text-slate-500 text-sm mt-1">
-          Here's what's happening at Apex Institute today.
-        </p>
+      {/* Greeting */}
+      <div className="flex items-start
+        justify-between flex-wrap gap-4">
+        <div>
+          <h1 className="text-2xl font-bold
+            text-slate-800">
+            Good morning,{' '}
+            {user?.fullName?.split(' ')[0]}! 👋
+          </h1>
+          <p className="text-slate-500
+            text-sm mt-1">
+            Welcome to Apex ERP —
+            {' '}Academic Year 2025-26
+          </p>
+        </div>
       </div>
 
-      {/* Stats Grid */}
-      {(isAdmin || isFaculty) && (
-        <div className="grid grid-cols-1 sm:grid-cols-2
-          xl:grid-cols-4 gap-4">
+      {/* Admin / HOD Stats */}
+      {(isAdmin || isHod) && (
+        <div className="grid grid-cols-1
+          sm:grid-cols-2 xl:grid-cols-4 gap-4">
           <StatCard
             icon={Users}
             label="Total Students"
-            value="2,500"
+            value="2,500+"
             sub="Across all departments"
             color="text-blue-600"
             bg="bg-blue-50"
@@ -91,18 +114,18 @@ export default function DashboardHome() {
           <StatCard
             icon={UserCheck}
             label="Faculty Members"
-            value="150"
+            value="150+"
             sub="Active this semester"
-            color="text-emerald-600"
-            bg="bg-emerald-50"
+            color="text-violet-600"
+            bg="bg-violet-50"
           />
           <StatCard
             icon={ClipboardCheck}
             label="Avg Attendance"
             value="82%"
             sub="This semester"
-            color="text-violet-600"
-            bg="bg-violet-50"
+            color="text-emerald-600"
+            bg="bg-emerald-50"
           />
           <StatCard
             icon={CreditCard}
@@ -117,11 +140,11 @@ export default function DashboardHome() {
 
       {/* Student Stats */}
       {isStudent && (
-        <div className="grid grid-cols-1 sm:grid-cols-2
-          xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2
+          sm:grid-cols-4 gap-4">
           <StatCard
             icon={ClipboardCheck}
-            label="My Attendance"
+            label="Attendance"
             value="100%"
             sub="Data Structures"
             color="text-emerald-600"
@@ -130,8 +153,8 @@ export default function DashboardHome() {
           <StatCard
             icon={BookOpen}
             label="CGPA"
-            value="—"
-            sub="Results pending"
+            value="5.0"
+            sub="Semester 3"
             color="text-blue-600"
             bg="bg-blue-50"
           />
@@ -154,82 +177,146 @@ export default function DashboardHome() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      {/* Faculty Stats */}
+      {isFaculty && (
+        <div className="grid grid-cols-2
+          sm:grid-cols-4 gap-4">
+          <StatCard
+            icon={Users}
+            label="My Students"
+            value="60"
+            sub="This semester"
+            color="text-blue-600"
+            bg="bg-blue-50"
+          />
+          <StatCard
+            icon={ClipboardCheck}
+            label="Sessions Today"
+            value="3"
+            sub="Pending attendance"
+            color="text-emerald-600"
+            bg="bg-emerald-50"
+          />
+          <StatCard
+            icon={MessageSquare}
+            label="Grievances"
+            value="0"
+            sub="Assigned to you"
+            color="text-orange-600"
+            bg="bg-orange-50"
+          />
+          <StatCard
+            icon={TrendingUp}
+            label="Avg Rating"
+            value="4.2"
+            sub="Student feedback"
+            color="text-violet-600"
+            bg="bg-violet-50"
+          />
+        </div>
+      )}
+
+      <div className="grid grid-cols-1
+        xl:grid-cols-3 gap-6">
 
         {/* Quick Actions */}
         <div className="xl:col-span-2">
           <h2 className="text-base font-semibold
-            text-slate-700 mb-4">Quick Actions</h2>
+            text-slate-700 mb-4">
+            Quick Actions
+          </h2>
           <div className="grid grid-cols-2
             sm:grid-cols-3 gap-4">
+
             {(isAdmin || isFaculty) && (
               <QuickAction
                 icon={ClipboardCheck}
                 label="Mark Attendance"
-                description="Record today's attendance"
+                description="Record today's sessions"
+                path="/attendance"
                 color="bg-blue-500"
-                onClick={() =>
-                  window.location.href = '/attendance'}
               />
             )}
-            {(isAdmin || isFaculty) && (
+            {(isAdmin || isFaculty
+              || user?.role === ROLES.COE) && (
               <QuickAction
                 icon={BookOpen}
                 label="Enter Marks"
                 description="Upload exam results"
+                path="/exam"
                 color="bg-violet-500"
-                onClick={() =>
-                  window.location.href = '/exam'}
               />
             )}
-            {(isAdmin) && (
+            {isAdmin && (
               <QuickAction
                 icon={Users}
                 label="Add Student"
                 description="Enroll new student"
+                path="/students"
                 color="bg-emerald-500"
-                onClick={() =>
-                  window.location.href = '/students'}
               />
             )}
-            {(isAdmin) && (
+            {(isAdmin || isFinance) && (
               <QuickAction
                 icon={CreditCard}
                 label="Fee Payment"
-                description="Record fee payment"
+                description="Record payment"
+                path="/fee"
                 color="bg-orange-500"
-                onClick={() =>
-                  window.location.href = '/fee'}
+              />
+            )}
+            {(isAdmin || isLibrarian) && (
+              <QuickAction
+                icon={Library}
+                label="Issue Book"
+                description="Library management"
+                path="/library"
+                color="bg-teal-500"
+              />
+            )}
+            {(isAdmin || isWarden) && (
+              <QuickAction
+                icon={Home}
+                label="Hostel"
+                description="Room management"
+                path="/hostel"
+                color="bg-pink-500"
               />
             )}
             {isStudent && (
               <QuickAction
                 icon={ClipboardCheck}
                 label="My Attendance"
-                description="View attendance summary"
+                description="View summary"
+                path="/attendance"
                 color="bg-blue-500"
-                onClick={() =>
-                  window.location.href = '/attendance'}
               />
             )}
             {isStudent && (
               <QuickAction
                 icon={BookOpen}
                 label="My Results"
-                description="View exam results"
+                description="View marks"
+                path="/exam"
                 color="bg-violet-500"
-                onClick={() =>
-                  window.location.href = '/exam'}
               />
             )}
             {isStudent && (
               <QuickAction
                 icon={AlertCircle}
                 label="Grievance"
-                description="Submit a complaint"
+                description="Submit complaint"
+                path="/grievance"
                 color="bg-red-500"
-                onClick={() =>
-                  window.location.href = '/grievance'}
+              />
+            )}
+            {isStudent && (
+              <QuickAction
+                icon={TrendingUp}
+                label="Feedback"
+                description="Rate faculty"
+                path="/feedback"
+                color="bg-yellow-500"
               />
             )}
           </div>
@@ -238,7 +325,9 @@ export default function DashboardHome() {
         {/* Notice Board */}
         <div>
           <h2 className="text-base font-semibold
-            text-slate-700 mb-4">Notice Board</h2>
+            text-slate-700 mb-4">
+            Notice Board
+          </h2>
           <div className="bg-white rounded-2xl
             border border-slate-100 shadow-sm
             divide-y divide-slate-50">
@@ -263,13 +352,18 @@ export default function DashboardHome() {
                 time:  '3 days ago',
                 type:  'info',
               },
+              {
+                title: 'Internal Marks Published',
+                time:  '4 days ago',
+                type:  'success',
+              },
             ].map((n, i) => (
               <div key={i}
-                className="flex items-start gap-3
-                  p-4 hover:bg-slate-50 transition-colors
-                  cursor-pointer">
-                <div className={`w-2 h-2 rounded-full mt-1.5
-                  flex-shrink-0
+                className="flex items-start
+                  gap-3 p-4 hover:bg-slate-50
+                  transition-colors cursor-pointer">
+                <div className={`w-2 h-2
+                  rounded-full mt-1.5 flex-shrink-0
                   ${n.type === 'warning'
                     ? 'bg-yellow-400'
                     : n.type === 'success'
@@ -281,7 +375,8 @@ export default function DashboardHome() {
                     text-slate-700 truncate">
                     {n.title}
                   </p>
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <p className="text-xs
+                    text-slate-400 mt-0.5">
                     {n.time}
                   </p>
                 </div>
@@ -291,22 +386,25 @@ export default function DashboardHome() {
         </div>
       </div>
 
-      {/* Info Banner */}
+      {/* Banner */}
       <div className="bg-gradient-to-r
         from-blue-600 to-indigo-600
         rounded-2xl p-6 flex items-center
-        justify-between">
+        justify-between overflow-hidden">
         <div>
-          <h3 className="text-white font-semibold text-lg">
+          <h3 className="text-white font-bold
+            text-lg">
             Academic Year 2025-26
           </h3>
-          <p className="text-blue-200 text-sm mt-1">
-            Semester 2 • Odd Semester •
+          <p className="text-blue-200
+            text-sm mt-1">
+            Semester 2 • Even Semester •
             Exam period: April 2026
           </p>
         </div>
         <GraduationCap
-          size={48} className="text-white/20" />
+          size={64}
+          className="text-white/20 flex-shrink-0" />
       </div>
     </div>
   )

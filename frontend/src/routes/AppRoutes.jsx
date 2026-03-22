@@ -23,6 +23,8 @@ import LibraryPage
   from '../pages/library/LibraryPage'
 import GrievancePage
   from '../pages/grievance/GrievancePage'
+import FeedbackPage
+  from '../pages/feedback/FeedbackPage'
 import NotificationsPage
   from '../pages/notifications/NotificationsPage'
 import UnauthorizedPage
@@ -68,6 +70,8 @@ export default function AppRoutes() {
           element={<LibraryPage />} />
         <Route path="/grievance"
           element={<GrievancePage />} />
+        <Route path="/feedback"
+          element={<FeedbackPage />} />
         <Route path="/notifications"
           element={<NotificationsPage />} />
       </Route>
