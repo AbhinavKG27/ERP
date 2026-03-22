@@ -18,6 +18,14 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
         """)
     Optional<Student> findByIdWithDetails(@Param("id") Long id);
 
+    @Query("""
+        SELECT s FROM Student s
+        JOIN FETCH s.user
+        WHERE s.user.id = :userId
+        """)
+    Optional<Student> findByUserIdWithDetails(
+            @Param("userId") Long userId);
+
     Optional<Student> findByRollNumber(String rollNumber);
 
     boolean existsByRollNumber(String rollNumber);

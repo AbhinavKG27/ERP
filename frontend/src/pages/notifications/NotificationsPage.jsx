@@ -78,7 +78,9 @@ export default function NotificationsPage() {
         ['notifications'])
       queryClient.invalidateQueries(
         ['unread-count'])
-    } catch {}
+    } catch (error) {
+      console.debug('Mark read failed:', error)
+    }
   }
 
   return (
@@ -441,5 +443,3 @@ function SendNotificationModal({
     </div>
   )
 }
-
-

@@ -17,7 +17,9 @@ export const notificationApi = {
     api.put(
       `/notifications/${notificationId}/read/${userId}`),
   markAllRead:    (userId, role) =>
-    api.put(`/notifications/user/${userId}/read-all`,
-      { params: { role } }),
+    api.put(
+      `/notifications/user/${userId}/read-all`,
+      null,
+      { params: { role } }
+    ),
 }
-

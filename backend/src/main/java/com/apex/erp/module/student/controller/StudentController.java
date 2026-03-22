@@ -5,6 +5,7 @@ import com.apex.erp.common.PagedResponse;
 import com.apex.erp.module.student.dto.CreateStudentRequest;
 import com.apex.erp.module.student.dto.StudentDto;
 import com.apex.erp.module.student.service.StudentService;
+import com.apex.erp.security.SecurityService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class StudentController {
 
     private final StudentService studentService;
+    private final SecurityService securityService;
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -43,6 +45,16 @@ public class StudentController {
         return ResponseEntity.ok(
             ApiResponse.success(
                 studentService.getStudentById(id)));
+    }
+
+    @GetMapping("/me")
+    @PreAuthorize("hasRole('STUDENT')")
+    @Operation(summary = "Get current logged-in student profile")
+    public ResponseEntity<ApiResponse<StudentDto>> getCurrentStudent() {
+        Long userId = securityService.getCurrentUserId();
+        return ResponseEntity.ok(
+            ApiResponse.success(
+                studentService.getStudentByUserId(userId)));
     }
 
     @GetMapping

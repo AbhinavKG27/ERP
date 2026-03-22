@@ -5,6 +5,11 @@ import {
   AlertCircle, TrendingUp, Bell,
   MessageSquare, Home, Library,
 } from 'lucide-react'
+import {
+  ResponsiveContainer, AreaChart,
+  Area, CartesianGrid, XAxis,
+  Tooltip, BarChart, Bar, YAxis
+} from 'recharts'
 import useAuthStore from '../../store/authStore'
 import { ROLES } from '../../utils/constants'
 import { formatCurrency } from '../../utils/helpers'
@@ -78,6 +83,22 @@ export default function DashboardHome() {
     user?.role === ROLES.LIBRARIAN
   const isWarden  =
     user?.role === ROLES.HOSTEL_WARDEN
+  const attendanceTrend = [
+    { month: 'Oct', attendance: 76 },
+    { month: 'Nov', attendance: 79 },
+    { month: 'Dec', attendance: 81 },
+    { month: 'Jan', attendance: 83 },
+    { month: 'Feb', attendance: 82 },
+    { month: 'Mar', attendance: 85 },
+  ]
+  const feeTrend = [
+    { month: 'Oct', collected: 28 },
+    { month: 'Nov', collected: 36 },
+    { month: 'Dec', collected: 24 },
+    { month: 'Jan', collected: 42 },
+    { month: 'Feb', collected: 38 },
+    { month: 'Mar', collected: 45 },
+  ]
 
   return (
     <div className="space-y-6">
@@ -384,7 +405,50 @@ export default function DashboardHome() {
             ))}
           </div>
         </div>
+
+        {(isAdmin || isHod || isFinance) && (
+          <div className="xl:col-span-1 bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
+            <h3 className="text-sm font-semibold text-slate-700 mb-3">
+              Fee Collection Trend (Lakhs)
+            </h3>
+            <div className="h-56">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={feeTrend}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="collected" fill="#2563eb" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        )}
       </div>
+
+      {(isAdmin || isHod || isFaculty) && (
+        <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
+          <h3 className="text-sm font-semibold text-slate-700 mb-3">
+            Attendance Trend
+          </h3>
+          <div className="h-60">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={attendanceTrend}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <Tooltip />
+                <Area
+                  type="monotone"
+                  dataKey="attendance"
+                  stroke="#14b8a6"
+                  fill="#ccfbf1"
+                  strokeWidth={2}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
 
       {/* Banner */}
       <div className="bg-gradient-to-r

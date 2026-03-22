@@ -3,6 +3,8 @@ import api from './axios'
 export const studentApi = {
   create:  (data) =>
     api.post('/students', data),
+  getMe:   () =>
+    api.get('/students/me'),
   getById: (id) =>
     api.get(`/students/${id}`),
   getAll:  (page = 0, size = 10) =>

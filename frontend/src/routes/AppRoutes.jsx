@@ -1,34 +1,37 @@
+import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate }
   from 'react-router-dom'
 import useAuthStore from '../store/authStore'
 import DashboardLayout
   from '../components/layout/DashboardLayout'
-import LoginPage
-  from '../pages/auth/LoginPage'
-import DashboardHome
-  from '../pages/dashboard/DashboardHome'
-import StudentsPage
-  from '../pages/student/StudentsPage'
-import FacultyPage
-  from '../pages/faculty/FacultyPage'
-import AttendancePage
-  from '../pages/attendance/AttendancePage'
-import ExamPage
-  from '../pages/exam/ExamPage'
-import FeePage
-  from '../pages/fee/FeePage'
-import HostelPage
-  from '../pages/hostel/HostelPage'
-import LibraryPage
-  from '../pages/library/LibraryPage'
-import GrievancePage
-  from '../pages/grievance/GrievancePage'
-import FeedbackPage
-  from '../pages/feedback/FeedbackPage'
-import NotificationsPage
-  from '../pages/notifications/NotificationsPage'
-import UnauthorizedPage
-  from '../pages/shared/UnauthorizedPage'
+import Loader from '../components/ui/Loader'
+
+const LoginPage = lazy(() =>
+  import('../pages/auth/LoginPage'))
+const DashboardHome = lazy(() =>
+  import('../pages/dashboard/DashboardHome'))
+const StudentsPage = lazy(() =>
+  import('../pages/student/StudentsPage'))
+const FacultyPage = lazy(() =>
+  import('../pages/faculty/FacultyPage'))
+const AttendancePage = lazy(() =>
+  import('../pages/attendance/AttendancePage'))
+const ExamPage = lazy(() =>
+  import('../pages/exam/ExamPage'))
+const FeePage = lazy(() =>
+  import('../pages/fee/FeePage'))
+const HostelPage = lazy(() =>
+  import('../pages/hostel/HostelPage'))
+const LibraryPage = lazy(() =>
+  import('../pages/library/LibraryPage'))
+const GrievancePage = lazy(() =>
+  import('../pages/grievance/GrievancePage'))
+const FeedbackPage = lazy(() =>
+  import('../pages/feedback/FeedbackPage'))
+const NotificationsPage = lazy(() =>
+  import('../pages/notifications/NotificationsPage'))
+const UnauthorizedPage = lazy(() =>
+  import('../pages/shared/UnauthorizedPage'))
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuthStore()
@@ -38,12 +41,19 @@ const ProtectedRoute = ({ children }) => {
 }
 
 export default function AppRoutes() {
+  const withSuspense = (component) => (
+    <Suspense
+      fallback={<Loader text="Loading page..." />}>
+      {component}
+    </Suspense>
+  )
+
   return (
     <Routes>
       <Route path="/login"
-        element={<LoginPage />} />
+        element={withSuspense(<LoginPage />)} />
       <Route path="/unauthorized"
-        element={<UnauthorizedPage />} />
+        element={withSuspense(<UnauthorizedPage />)} />
       <Route path="/"
         element={<Navigate to="/dashboard" />} />
 
@@ -53,27 +63,27 @@ export default function AppRoutes() {
         </ProtectedRoute>
       }>
         <Route path="/dashboard"
-          element={<DashboardHome />} />
+          element={withSuspense(<DashboardHome />)} />
         <Route path="/students"
-          element={<StudentsPage />} />
+          element={withSuspense(<StudentsPage />)} />
         <Route path="/faculty"
-          element={<FacultyPage />} />
+          element={withSuspense(<FacultyPage />)} />
         <Route path="/attendance"
-          element={<AttendancePage />} />
+          element={withSuspense(<AttendancePage />)} />
         <Route path="/exam"
-          element={<ExamPage />} />
+          element={withSuspense(<ExamPage />)} />
         <Route path="/fee"
-          element={<FeePage />} />
+          element={withSuspense(<FeePage />)} />
         <Route path="/hostel"
-          element={<HostelPage />} />
+          element={withSuspense(<HostelPage />)} />
         <Route path="/library"
-          element={<LibraryPage />} />
+          element={withSuspense(<LibraryPage />)} />
         <Route path="/grievance"
-          element={<GrievancePage />} />
+          element={withSuspense(<GrievancePage />)} />
         <Route path="/feedback"
-          element={<FeedbackPage />} />
+          element={withSuspense(<FeedbackPage />)} />
         <Route path="/notifications"
-          element={<NotificationsPage />} />
+          element={withSuspense(<NotificationsPage />)} />
       </Route>
 
       <Route path="*"

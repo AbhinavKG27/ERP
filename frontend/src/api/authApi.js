@@ -3,10 +3,10 @@ import api from './axios'
 export const authApi = {
   login: (data) =>
     api.post('/auth/login', data),
-  logout: (userId) =>
-    api.post(`/auth/logout/${userId}`),
+  logout: () =>
+    api.post('/auth/logout'),
   refresh: (refreshToken) =>
     api.post('/auth/refresh', { refreshToken }),
-  changePassword: (userId, data) =>
-    api.post(`/auth/change-password/${userId}`, data),
+  changePassword: (data) =>
+    api.post('/auth/change-password', data),
 }

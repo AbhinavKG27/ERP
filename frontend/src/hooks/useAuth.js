@@ -53,12 +53,14 @@ export const useAuth = () => {
 
   const logoutUser = useCallback(async () => {
     try {
-      if (user?.id) await authApi.logout(user.id)
-    } catch {}
+      await authApi.logout()
+    } catch (error) {
+      console.debug('Logout API failed:', error)
+    }
     logout()
     navigate('/login')
     toast.success('Logged out')
-  }, [user, logout, navigate])
+  }, [logout, navigate])
 
   return {
     login,

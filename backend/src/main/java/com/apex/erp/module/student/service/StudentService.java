@@ -98,6 +98,13 @@ public class StudentService {
                     "Student", "id", id)));
     }
 
+    public StudentDto getStudentByUserId(Long userId) {
+        return studentMapper.toDto(
+            studentRepository.findByUserIdWithDetails(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                    "Student", "userId", userId)));
+    }
+
     public PagedResponse<StudentDto> getAllStudents(
             int page, int size, String sort) {
         size = Math.min(size,

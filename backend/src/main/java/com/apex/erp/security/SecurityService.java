@@ -1,6 +1,7 @@
 package com.apex.erp.security;
 
 import com.apex.erp.module.user.repository.UserRepository;
+import com.apex.erp.module.student.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 public class SecurityService {
 
     private final UserRepository userRepository;
+    private final StudentRepository studentRepository;
 
     public CustomUserDetails getCurrentUser() {
         Authentication auth =
@@ -25,10 +27,11 @@ public class SecurityService {
     public boolean isOwnStudent(Long studentId) {
         try {
             Long currentUserId = getCurrentUserId();
-            return userRepository.findById(currentUserId)
-                .map(u -> {
-                    return false;
-                })
+            return studentRepository.findById(studentId)
+                .map(s -> s.getUser() != null
+                    && currentUserId != null
+                    && currentUserId.equals(
+                        s.getUser().getId()))
                 .orElse(false);
         } catch (Exception e) {
             return false;

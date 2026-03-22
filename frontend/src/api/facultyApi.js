@@ -9,7 +9,7 @@ export const facultyApi = {
     api.get(`/faculty/department/${deptId}`,
       { params: { page } }),
   assignSubject:  (data) =>
-    api.post('/faculty/assign', data),
+    api.post('/faculty/assign-subject', data),
   getAssignments: (facultyId, academicYear) =>
     api.get(`/faculty/${facultyId}/assignments`,
       { params: { academicYear } }),

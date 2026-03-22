@@ -33,16 +33,14 @@ export default function AttendancePage() {
   // user.id = userId (e.g. 5)
   // studentId = students.id (e.g. 1)
   // These are DIFFERENT — we need studentId
-  const { data: myStudentRecord } = useQuery({
+  const {
+    data: myStudentRecord,
+    isLoading: isLoadingStudentProfile,
+  } = useQuery({
     queryKey: ['my-student', user?.id],
     queryFn:  async () => {
-      // Get all students and find the one
-      // matching the logged-in user's email
-      const res = await studentApi.getAll(0, 100)
-      const all = res.data?.data?.content
-        || res.data?.data || []
-      return all.find(s =>
-        s.email === user?.email) || null
+      const res = await studentApi.getMe()
+      return res.data?.data || null
     },
     enabled: isStudent,
   })
@@ -119,7 +117,7 @@ export default function AttendancePage() {
       </div>
 
       {/* Student loading state */}
-      {isStudent && !studentId && (
+      {isStudent && isLoadingStudentProfile && (
         <div className="bg-white rounded-2xl
           border border-slate-100 shadow-sm
           p-12 text-center">
@@ -129,6 +127,18 @@ export default function AttendancePage() {
             mb-3" />
           <p className="text-slate-400 text-sm">
             Loading your attendance...
+          </p>
+        </div>
+      )}
+
+      {isStudent && !isLoadingStudentProfile
+        && !studentId && (
+        <div className="bg-white rounded-2xl
+          border border-red-100 shadow-sm
+          p-12 text-center">
+          <p className="text-red-500 text-sm">
+            Unable to load your student profile.
+            Please contact admin.
           </p>
         </div>
       )}
@@ -374,4 +384,3 @@ function StudentAttendanceRow({
     </div>
   )
 }
-

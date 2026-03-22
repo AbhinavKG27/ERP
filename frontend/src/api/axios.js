@@ -39,20 +39,31 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const original = error.config
+    const isAuthRoute =
+      original?.url?.includes('/auth/login')
+      || original?.url?.includes('/auth/refresh')
+
     if (error.response?.status === 401
-        && !original._retry) {
+        && !original?._retry
+        && !isAuthRoute) {
       original._retry = true
       try {
         const raw =
           localStorage.getItem('apex-auth')
-        const parsed = JSON.parse(raw)
+        const parsed = raw ? JSON.parse(raw) : null
         const refreshToken =
           parsed?.state?.refreshToken
+        if (!refreshToken) {
+          throw new Error('No refresh token')
+        }
         const res = await axios.post(
           '/api/v1/auth/refresh',
           { refreshToken })
         const newToken =
           res.data?.data?.accessToken
+        if (!newToken) {
+          throw new Error('Invalid refresh response')
+        }
         parsed.state.accessToken = newToken
         localStorage.setItem('apex-auth',
           JSON.stringify(parsed))
