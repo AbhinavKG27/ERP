@@ -7,21 +7,17 @@ const api = axios.create({
 
 const getToken = () => {
   try {
+    // Try zustand persisted store first
     const raw = localStorage.getItem('apex-auth')
-    if (!raw) return null
-    const parsed = JSON.parse(raw)
-    return parsed?.state?.accessToken || null
-  } catch {
+    if (raw) {
+      const parsed = JSON.parse(raw)
+      const token = parsed?.state?.accessToken
+      if (token) return token
+    }
+    // Fallback to direct key
+    const direct = localStorage.getItem('accessToken')
+    if (direct) return direct
     return null
-  }
-}
-
-const getRefreshToken = () => {
-  try {
-    const raw = localStorage.getItem('apex-auth')
-    if (!raw) return null
-    const parsed = JSON.parse(raw)
-    return parsed?.state?.refreshToken || null
   } catch {
     return null
   }
@@ -31,7 +27,8 @@ api.interceptors.request.use(
   (config) => {
     const token = getToken()
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+      config.headers.Authorization =
+        `Bearer ${token}`
     }
     return config
   },
@@ -46,13 +43,16 @@ api.interceptors.response.use(
         && !original._retry) {
       original._retry = true
       try {
-        const refreshToken = getRefreshToken()
+        const raw =
+          localStorage.getItem('apex-auth')
+        const parsed = JSON.parse(raw)
+        const refreshToken =
+          parsed?.state?.refreshToken
         const res = await axios.post(
           '/api/v1/auth/refresh',
           { refreshToken })
-        const newToken = res.data.data.accessToken
-        const raw = localStorage.getItem('apex-auth')
-        const parsed = JSON.parse(raw)
+        const newToken =
+          res.data?.data?.accessToken
         parsed.state.accessToken = newToken
         localStorage.setItem('apex-auth',
           JSON.stringify(parsed))
