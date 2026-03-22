@@ -4,37 +4,41 @@ import { persist } from 'zustand/middleware'
 const useAuthStore = create(
   persist(
     (set) => ({
-      user:         null,
-      accessToken:  null,
-      refreshToken: null,
+      user:            null,
+      accessToken:     null,
+      refreshToken:    null,
       isAuthenticated: false,
 
-      setAuth: (userData, tokens) => set({
-        user:            userData,
-        accessToken:     tokens.accessToken,
-        refreshToken:    tokens.refreshToken,
-        isAuthenticated: true,
-      }),
-
-      logout: () => {
-        localStorage.removeItem('auth-storage')
+      setAuth: (user, tokens) => {
+        if (!tokens?.accessToken) {
+          console.error('setAuth: no accessToken!', tokens)
+          return
+        }
         set({
-          user:            null,
-          accessToken:     null,
-          refreshToken:    null,
-          isAuthenticated: false,
+          user,
+          isAuthenticated: true,
+          accessToken:     tokens.accessToken,
+          refreshToken:    tokens.refreshToken || null,
         })
       },
 
-      updateToken: (accessToken) => set({ accessToken }),
+      logout: () => set({
+        user:            null,
+        isAuthenticated: false,
+        accessToken:     null,
+        refreshToken:    null,
+      }),
+
+      updateToken: (accessToken) =>
+        set({ accessToken }),
     }),
     {
-      name: 'auth-storage',
-      partialize: (state) => ({
-        user:            state.user,
-        accessToken:     state.accessToken,
-        refreshToken:    state.refreshToken,
-        isAuthenticated: state.isAuthenticated,
+      name: 'apex-auth',
+      partialize: (s) => ({
+        user:            s.user,
+        accessToken:     s.accessToken,
+        refreshToken:    s.refreshToken,
+        isAuthenticated: s.isAuthenticated,
       }),
     }
   )

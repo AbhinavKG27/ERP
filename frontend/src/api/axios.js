@@ -5,12 +5,9 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 })
 
-const AUTH_STORAGE_KEY = 'auth-storage'
-
-// Read token from Zustand persisted storage
 const getToken = () => {
   try {
-    const raw = localStorage.getItem(AUTH_STORAGE_KEY)
+    const raw = localStorage.getItem('apex-auth')
     if (!raw) return null
     const parsed = JSON.parse(raw)
     return parsed?.state?.accessToken || null
@@ -19,13 +16,27 @@ const getToken = () => {
   }
 }
 
-api.interceptors.request.use((config) => {
-  const token = getToken()
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
+const getRefreshToken = () => {
+  try {
+    const raw = localStorage.getItem('apex-auth')
+    if (!raw) return null
+    const parsed = JSON.parse(raw)
+    return parsed?.state?.refreshToken || null
+  } catch {
+    return null
   }
-  return config
-}, (error) => Promise.reject(error))
+}
+
+api.interceptors.request.use(
+  (config) => {
+    const token = getToken()
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+  },
+  (error) => Promise.reject(error)
+)
 
 api.interceptors.response.use(
   (response) => response,
@@ -35,25 +46,21 @@ api.interceptors.response.use(
         && !original._retry) {
       original._retry = true
       try {
-        const raw = localStorage.getItem(AUTH_STORAGE_KEY)
-        const parsed = JSON.parse(raw)
-        const refreshToken =
-          parsed?.state?.refreshToken
+        const refreshToken = getRefreshToken()
         const res = await axios.post(
           '/api/v1/auth/refresh',
           { refreshToken })
         const newToken = res.data.data.accessToken
-
-        // Update stored token
+        const raw = localStorage.getItem('apex-auth')
+        const parsed = JSON.parse(raw)
         parsed.state.accessToken = newToken
-        localStorage.setItem(AUTH_STORAGE_KEY,
+        localStorage.setItem('apex-auth',
           JSON.stringify(parsed))
-
         original.headers.Authorization =
           `Bearer ${newToken}`
         return api(original)
       } catch {
-        localStorage.removeItem(AUTH_STORAGE_KEY)
+        localStorage.removeItem('apex-auth')
         window.location.href = '/login'
       }
     }

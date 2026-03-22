@@ -15,8 +15,9 @@ export const formatCurrency = (amount) => {
 
 export const getInitials = (name) => {
   if (!name) return '?'
-  return name.split(' ').map(n => n[0])
-    .join('').toUpperCase().slice(0, 2)
+  return name.split(' ')
+    .map(n => n[0]).join('')
+    .toUpperCase().slice(0, 2)
 }
 
 export const getAttendanceColor = (pct) => {
@@ -35,38 +36,44 @@ export const getAttendanceBg = (pct) => {
 
 export const getGradeColor = (grade) => {
   const c = {
-    'O': 'text-emerald-600', 'A+': 'text-green-600',
-    'A': 'text-blue-600',    'B+': 'text-blue-500',
-    'B': 'text-yellow-600',   'C': 'text-orange-600',
-    'F': 'text-red-600',
+    'O':'text-emerald-600','A+':'text-green-600',
+    'A':'text-blue-600','B+':'text-blue-500',
+    'B':'text-yellow-600','C':'text-orange-600',
+    'F':'text-red-600',
   }
   return c[grade] || 'text-gray-600'
 }
 
 export const getRoleHomePath = (role) => {
   const paths = {
-    ADMIN:         '/dashboard',
-    HOD:           '/dashboard',
-    FACULTY:       '/dashboard',
-    STUDENT:       '/dashboard',
-    FINANCE:       '/dashboard',
-    LIBRARIAN:     '/library',
-    HOSTEL_WARDEN: '/hostel',
-    COE:           '/dashboard',
+    ADMIN:'dashboard', HOD:'dashboard',
+    FACULTY:'dashboard', STUDENT:'dashboard',
+    FINANCE:'fee', LIBRARIAN:'library',
+    HOSTEL_WARDEN:'hostel', COE:'exam',
   }
-  return paths[role] || '/dashboard'
+  return `/${paths[role] || 'dashboard'}`
 }
 
 export const getRoleLabel = (role) => {
   const labels = {
-    ADMIN:         'Administrator',
-    HOD:           'Head of Department',
-    FACULTY:       'Faculty',
-    STUDENT:       'Student',
-    FINANCE:       'Finance Officer',
-    LIBRARIAN:     'Librarian',
-    HOSTEL_WARDEN: 'Hostel Warden',
-    COE:           'Controller of Examinations',
+    ADMIN:'Administrator',
+    HOD:'Head of Department',
+    FACULTY:'Faculty',
+    STUDENT:'Student',
+    FINANCE:'Finance Officer',
+    LIBRARIAN:'Librarian',
+    HOSTEL_WARDEN:'Hostel Warden',
+    COE:'Controller of Examinations',
   }
   return labels[role] || role
+}
+
+export const getFeeStatusBadge = (status) => {
+  const s = {
+    PAID:    'bg-emerald-50 text-emerald-700 border-emerald-200',
+    PARTIAL: 'bg-yellow-50 text-yellow-700 border-yellow-200',
+    PENDING: 'bg-orange-50 text-orange-700 border-orange-200',
+    OVERDUE: 'bg-red-50 text-red-700 border-red-200',
+  }
+  return s[status] || s.PENDING
 }

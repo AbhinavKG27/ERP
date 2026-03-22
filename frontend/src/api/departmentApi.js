@@ -1,13 +1,20 @@
 import api from './axios'
 
 export const departmentApi = {
-  getAll:         () => api.get('/departments'),
-  create:         (data) => api.post('/departments', data),
-  getPrograms:    (deptId) =>
+  getAll:        () =>
+    api.get('/departments'),
+  create:        (data) =>
+    api.post('/departments', data),
+  getPrograms:   (deptId) =>
     api.get(`/programs/department/${deptId}`),
-  getBatches:     (programId) =>
+  createProgram: (data) =>
+    api.post('/programs', data),
+  getBatches:    (programId) =>
     api.get(`/batches/program/${programId}`),
-  getSubjects:    (deptId) =>
+  createBatch:   (data) =>
+    api.post('/batches', data),
+  getSubjects:   (deptId) =>
     api.get(`/subjects/department/${deptId}`),
-  createSubject:  (data) => api.post('/subjects', data),
+  createSubject: (data) =>
+    api.post('/subjects', data),
 }
