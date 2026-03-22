@@ -35,7 +35,7 @@ public class StudentController {
                 studentService.createStudent(request)));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id:\\d+}")
     @PreAuthorize("hasAnyRole('ADMIN','HOD','FACULTY','COE') "
                 + "or (hasRole('STUDENT') "
                 + "and @securityService.isOwnStudent(#id))")
@@ -80,7 +80,7 @@ public class StudentController {
             studentService.searchStudents(query, page, size));
     }
 
-    @PatchMapping("/{id}/status")
+    @PatchMapping("/{id:\\d+}/status")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update student status")
     public ResponseEntity<ApiResponse<StudentDto>> updateStatus(
