@@ -15,19 +15,27 @@ public interface BookRepository
     Optional<Book> findByIsbn(String isbn);
     Optional<Book> findByBarcode(String barcode);
 
-    @Query("""
+    @Query(value = """
         SELECT b FROM Book b
-        LEFT JOIN FETCH b.department
         WHERE LOWER(b.title) LIKE LOWER(CONCAT('%',:q,'%'))
-        OR LOWER(b.author) LIKE LOWER(CONCAT('%',:q,'%'))
-        OR LOWER(b.isbn) LIKE LOWER(CONCAT('%',:q,'%'))
+           OR LOWER(b.author) LIKE LOWER(CONCAT('%',:q,'%'))
+           OR LOWER(b.isbn) LIKE LOWER(CONCAT('%',:q,'%'))
+        """,
+        countQuery = """
+        SELECT COUNT(b) FROM Book b
+        WHERE LOWER(b.title) LIKE LOWER(CONCAT('%',:q,'%'))
+           OR LOWER(b.author) LIKE LOWER(CONCAT('%',:q,'%'))
+           OR LOWER(b.isbn) LIKE LOWER(CONCAT('%',:q,'%'))
         """)
     Page<Book> searchBooks(
             @Param("q") String query, Pageable pageable);
 
-    @Query("""
+    @Query(value = """
         SELECT b FROM Book b
-        LEFT JOIN FETCH b.department
+        WHERE b.availableCopies > 0
+        """,
+        countQuery = """
+        SELECT COUNT(b) FROM Book b
         WHERE b.availableCopies > 0
         """)
     Page<Book> findAvailableBooks(Pageable pageable);

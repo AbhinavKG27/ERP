@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -28,7 +29,7 @@ public class DepartmentService {
     private final UserRepository       userRepository;
     private final DepartmentMapper     mapper;
 
-    // ═══════════════════════════════════════════
+    // ══════════════════════════════════════════
     // DEPARTMENT
     // ═══════════════════════════════════════════
 
@@ -64,19 +65,22 @@ public class DepartmentService {
 
     public List<DepartmentDto> getAllDepartments() {
         return departmentRepository.findAllActive()
-            .stream().map(mapper::toDto).toList();
+            .stream()
+            .map(this::safeDepartmentDto)
+            .filter(Objects::nonNull)
+            .toList();
     }
 
     public DepartmentDto getDepartmentById(Long id) {
         return mapper.toDto(
-            departmentRepository.findById(id)
+            departmentRepository.findByIdWithHod(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                     "Department", "id", id)));
     }
 
     @Transactional
     public DepartmentDto assignHod(Long deptId, Long hodId) {
-        Department dept = departmentRepository.findById(deptId)
+        Department dept = departmentRepository.findByIdWithHod(deptId)
             .orElseThrow(() -> new ResourceNotFoundException(
                 "Department", "id", deptId));
         User hod = userRepository.findById(hodId)
@@ -84,6 +88,15 @@ public class DepartmentService {
                 "User", "id", hodId));
         dept.setHod(hod);
         return mapper.toDto(departmentRepository.save(dept));
+    }
+
+
+    private DepartmentDto safeDepartmentDto(Department department) {
+        try {
+            return mapper.toDto(department);
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     // ═══════════════════════════════════════════

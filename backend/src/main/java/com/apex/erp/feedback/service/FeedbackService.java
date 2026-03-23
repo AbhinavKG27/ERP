@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -63,14 +64,20 @@ public class FeedbackService {
     @Transactional(readOnly = true)
     public List<FeedbackFormResponse> getAllForms() {
         return formRepository.findAll()
-            .stream().map(mapper::toFormResponse).toList();
+            .stream()
+            .map(this::safeFormResponse)
+            .filter(Objects::nonNull)
+            .toList();
     }
 
     @Transactional(readOnly = true)
     public List<FeedbackFormResponse> getFormsByFaculty(
             Long facultyId) {
         return formRepository.findByFacultyId(facultyId)
-            .stream().map(mapper::toFormResponse).toList();
+            .stream()
+            .map(this::safeFormResponse)
+            .filter(Objects::nonNull)
+            .toList();
     }
 
     public FeedbackFormResponse closeForm(Long formId) {
@@ -152,6 +159,15 @@ public class FeedbackService {
             .avgOverallRating(round(responseRepository
                 .findAvgOverallRatingByFaculty(facultyId)))
             .build();
+    }
+
+
+    private FeedbackFormResponse safeFormResponse(FeedbackForm form) {
+        try {
+            return mapper.toFormResponse(form);
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     private Double round(Double val) {

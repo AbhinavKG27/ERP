@@ -2,6 +2,7 @@ package com.apex.erp.module.department.mapper;
 
 import com.apex.erp.module.department.dto.*;
 import com.apex.erp.module.department.entity.*;
+import com.apex.erp.module.user.entity.User;
 import org.mapstruct.*;
 
 @Mapper(componentModel = "spring",
@@ -9,8 +10,8 @@ import org.mapstruct.*;
             NullValuePropertyMappingStrategy.IGNORE)
 public interface DepartmentMapper {
 
-    @Mapping(source = "hod.id",       target = "hodId")
-    @Mapping(source = "hod.fullName", target = "hodName")
+    @Mapping(target = "hodId",   expression = "java(getHodId(department))")
+    @Mapping(target = "hodName", expression = "java(getHodName(department))")
     DepartmentDto toDto(Department department);
 
     @Mapping(source = "department.id",   target = "departmentId")
@@ -25,4 +26,16 @@ public interface DepartmentMapper {
     @Mapping(source = "department.id",   target = "departmentId")
     @Mapping(source = "department.name", target = "departmentName")
     SubjectDto toDto(Subject subject);
+
+    default Long getHodId(Department department) {
+        if (department == null) return null;
+        User hod = department.getHod();
+        return hod != null ? hod.getId() : null;
+    }
+
+    default String getHodName(Department department) {
+        if (department == null) return null;
+        User hod = department.getHod();
+        return hod != null ? hod.getFullName() : null;
+    }
 }
