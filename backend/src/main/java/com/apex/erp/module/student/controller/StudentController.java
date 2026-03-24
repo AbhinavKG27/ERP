@@ -58,7 +58,7 @@ public class StudentController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN','HOD','COE')")
+    @PreAuthorize("hasAnyRole('ADMIN','HOD','COE','FACULTY','LIBRARIAN')")
     @Operation(summary = "Get all students (paginated)")
     public ResponseEntity<PagedResponse<StudentDto>> getAll(
             @RequestParam(defaultValue = "0")  int page,

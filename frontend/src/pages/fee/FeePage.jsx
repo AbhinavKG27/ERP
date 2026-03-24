@@ -36,13 +36,9 @@ export default function FeePage() {
   const { data: myStudent } = useQuery({
     queryKey: ['my-student-fee', user?.id],
     queryFn:  () =>
-      studentApi.getAll(0, 100)
-        .then(r => {
-          const all = r.data?.data?.content
-            || r.data?.data || []
-          return all.find(s =>
-            s.email === user?.email) || null
-        }),
+      studentApi.getMe()
+        .then(r => r.data?.data || null)
+        .catch(() => null),
     enabled: isStudent,
   })
 
