@@ -33,14 +33,14 @@ public class FeedbackController {
     }
 
     @GetMapping("/forms")
-    @PreAuthorize("hasAnyRole('ADMIN','HOD','FACULTY')")
+    @PreAuthorize("hasAnyRole('ADMIN','HOD','FACULTY','STUDENT')")
     public ResponseEntity<ApiResponse<List<FeedbackFormResponse>>>
             getAllForms() {
         return ResponseEntity.ok(ApiResponse.success(
             feedbackService.getAllForms()));
     }
 
-    @GetMapping("/forms/{id}")
+    @GetMapping("/forms/{id:\\d+}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<FeedbackFormResponse>>
             getFormById(@PathVariable Long id) {
@@ -56,7 +56,7 @@ public class FeedbackController {
             feedbackService.getFormsByFaculty(facultyId)));
     }
 
-    @PutMapping("/forms/{id}/close")
+    @PutMapping("/forms/{id:\\d+}/close")
     @PreAuthorize("hasAnyRole('ADMIN','HOD')")
     public ResponseEntity<ApiResponse<FeedbackFormResponse>>
             closeForm(@PathVariable Long id) {
@@ -64,7 +64,7 @@ public class FeedbackController {
             "Form closed", feedbackService.closeForm(id)));
     }
 
-    @PostMapping("/forms/{formId}/submit")
+    @PostMapping("/forms/{formId:\\d+}/submit")
     @PreAuthorize("hasAnyRole('STUDENT','ADMIN')")
     public ResponseEntity<ApiResponse<FeedbackResponseDto>> submit(
             @PathVariable Long formId,
@@ -75,7 +75,7 @@ public class FeedbackController {
                     formId, request)));
     }
 
-    @GetMapping("/forms/{formId}/responses")
+    @GetMapping("/forms/{formId:\\d+}/responses")
     @PreAuthorize("hasAnyRole('ADMIN','HOD')")
     public ResponseEntity<ApiResponse<List<FeedbackResponseDto>>>
             getResponses(@PathVariable Long formId) {

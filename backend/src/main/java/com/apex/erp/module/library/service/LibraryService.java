@@ -79,6 +79,11 @@ public class LibraryService {
             PageRequest.of(page, size)).map(mapper::toDto);
     }
 
+    public Page<BookDto> getAllBooks(int page, int size) {
+        return bookRepo.findAll(
+            PageRequest.of(page, size)).map(mapper::toDto);
+    }
+
     // ── Issue book ────────────────────────────────────────────
     @Transactional
     public BookIssueDto issueBook(IssueBookRequest req) {

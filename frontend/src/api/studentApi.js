@@ -11,5 +11,5 @@ export const studentApi = {
     api.get('/students', { params: { page, size } }),
   search:  (query, page = 0) =>
     api.get('/students/search',
-      { params: { q: query, page, size: 10 } }),
+      { params: { query, page, size: 10 } }),
 }

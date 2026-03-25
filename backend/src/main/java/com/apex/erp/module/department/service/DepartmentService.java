@@ -31,11 +31,10 @@ public class DepartmentService {
 
     // ══════════════════════════════════════════
     // DEPARTMENT
-    // ═══════════════════════════════════════════
+    // ══════════════════════════════════════════
 
     @Transactional
-    public DepartmentDto createDepartment(
-            CreateDepartmentRequest req) {
+    public DepartmentDto createDepartment(CreateDepartmentRequest req) {
         if (departmentRepository.existsByCode(req.getCode()))
             throw new BusinessRuleException(
                 "DUPLICATE_DEPT_CODE",
@@ -62,7 +61,7 @@ public class DepartmentService {
         log.info("Department created: code={}", saved.getCode());
         return mapper.toDto(saved);
     }
-
+    @Transactional(readOnly = true)
     public List<DepartmentDto> getAllDepartments() {
         return departmentRepository.findAllActive()
             .stream()
@@ -90,18 +89,20 @@ public class DepartmentService {
         return mapper.toDto(departmentRepository.save(dept));
     }
 
-
     private DepartmentDto safeDepartmentDto(Department department) {
         try {
             return mapper.toDto(department);
         } catch (Exception ex) {
+            log.warn("Failed to map department id={}: {}",
+                     department != null ? department.getId() : null,
+                     ex.getMessage());
             return null;
         }
     }
 
-    // ═══════════════════════════════════════════
+    // ══════════════════════════════════════════
     // PROGRAM
-    // ═══════════════════════════════════════════
+    // ══════════════════════════════════════════
 
     @Transactional
     public ProgramDto createProgram(CreateProgramRequest req) {
@@ -136,9 +137,9 @@ public class DepartmentService {
             .stream().map(mapper::toDto).toList();
     }
 
-    // ═══════════════════════════════════════════
+    // ══════════════════════════════════════════
     // BATCH
-    // ═══════════════════════════════════════════
+    // ══════════════════════════════════════════
 
     @Transactional
     public BatchDto createBatch(CreateBatchRequest req) {
@@ -167,9 +168,9 @@ public class DepartmentService {
             .stream().map(mapper::toDto).toList();
     }
 
-    // ═══════════════════════════════════════════
+    // ══════════════════════════════════════════
     // SUBJECT
-    // ═══════════════════════════════════════════
+    // ══════════════════════════════════════════
 
     @Transactional
     public SubjectDto createSubject(CreateSubjectRequest req) {

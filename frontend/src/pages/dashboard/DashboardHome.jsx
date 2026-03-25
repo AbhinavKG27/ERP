@@ -411,7 +411,7 @@ export default function DashboardHome() {
             <h3 className="text-sm font-semibold text-slate-700 mb-3">
               Fee Collection Trend (Lakhs)
             </h3>
-            <div className="h-56">
+            <div className="h-56 min-h-[224px] min-w-0">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={feeTrend}>
                   <CartesianGrid strokeDasharray="3 3" />
@@ -431,7 +431,7 @@ export default function DashboardHome() {
           <h3 className="text-sm font-semibold text-slate-700 mb-3">
             Attendance Trend
           </h3>
-          <div className="h-60">
+          <div className="h-60 min-h-[240px] min-w-0">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={attendanceTrend}>
                 <CartesianGrid strokeDasharray="3 3" />

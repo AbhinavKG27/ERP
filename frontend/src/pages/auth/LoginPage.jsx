@@ -21,21 +21,16 @@ export default function LoginPage() {
       const res = await authApi.login({ email, password })
       const payload = res.data?.data
 
-      // New API shape: data.user + data.accessToken + data.refreshToken + data.expiresIn
-      if (payload?.accessToken && payload?.refreshToken) {
-        setAuth({
-          user: payload.user,
-          accessToken: payload.accessToken,
-          refreshToken: payload.refreshToken
-        })
-      } else {
-        // Backward compatibility
-        setAuth({
-          user: payload.user ?? payload,
-          accessToken: payload.accessToken ?? payload.token,
-          refreshToken: payload.refreshToken
-        })
+      const authUser = payload?.user ?? {
+        id: payload?.userId,
+        fullName: payload?.fullName,
+        email: payload?.email,
+        role: payload?.role,
       }
+      const accessToken = payload?.accessToken ?? payload?.token
+      const refreshToken = payload?.refreshToken
+
+      setAuth(authUser, { accessToken, refreshToken })
 
       toast.success(`Welcome back, ${payload?.user?.fullName || payload?.fullName || 'User'}!`)
       navigate('/')

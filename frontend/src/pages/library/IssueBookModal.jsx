@@ -22,8 +22,8 @@ export default function IssueBookModal({
     queryKey: ['book-search', search],
     queryFn:  () =>
       libraryApi.searchBooks(search, 0)
-        .then(r =>
-          r.data?.data?.content
+        .then(r => r.data?.content
+          || r.data?.data?.content
           || r.data?.data || []),
     enabled: search.length >= 2,
   })
@@ -185,7 +185,8 @@ export default function IssueBookModal({
         <div className="flex items-center
           justify-end gap-3 p-5
           border-t border-slate-100">
-          <button onClick={onClose}
+          <button
+            onClick={onClose}
             className="px-4 py-2 text-sm
               font-medium text-slate-600
               hover:bg-slate-100 rounded-xl
@@ -195,17 +196,17 @@ export default function IssueBookModal({
           <button
             onClick={handleIssue}
             disabled={loading}
-            className="flex items-center gap-2
-              px-5 py-2 bg-blue-600
+            className="px-5 py-2 bg-blue-600
               hover:bg-blue-700
               disabled:bg-blue-400 text-white
               text-sm font-semibold rounded-xl
-              transition-colors">
-            {loading
-              ? <><Loader2 size={16}
-                  className="animate-spin" />
-                  Issuing...</>
-              : 'Issue Book'}
+              transition-colors flex items-center
+              gap-2">
+            {loading && (
+              <Loader2 size={16}
+                className="animate-spin" />
+            )}
+            Issue
           </button>
         </div>
       </div>

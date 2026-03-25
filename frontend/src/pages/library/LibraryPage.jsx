@@ -36,7 +36,7 @@ export default function LibraryPage() {
         return libraryApi.searchBooks(search, page)
           .then(r => r.data)
       }
-      return libraryApi.getAvailable(page)
+      return libraryApi.getBooks(page)
         .then(r => r.data)
     },
   })
@@ -59,8 +59,9 @@ export default function LibraryPage() {
     enabled: !isAdmin && !isLibrarian,
   })
 
-  const books = booksData?.data?.content
-    || booksData?.data || []
+  const books = booksData?.content
+    || booksData?.data
+    || []
 
   const tabs = [
     { id: 'books',    label: 'Book Catalog' },
@@ -259,57 +260,36 @@ export default function LibraryPage() {
                     </span>
                   )}
                 </div>
-                {!(isAdmin || isLibrarian)
-                  && book.availableCopies > 0 && (
+                {book.availableCopies > 0 && (
                   <button
                     onClick={async () => {
                       try {
-                        await libraryApi
-                          .reserveBook(book.id)
-                        toast.success(
-                          'Book reserved!')
-                      } catch (err) {
-                        toast.error(
-                          err?.response?.data
-                            ?.message
-                          || 'Failed to reserve')
+                        await libraryApi.reserveBook(book.id)
+                        toast.success('Book reserved!')
+                        queryClient.invalidateQueries(['books'])
+                      } catch {
+                        toast.error('Failed to reserve')
                       }
                     }}
-                    className="mt-3 w-full py-2
-                      bg-blue-50 hover:bg-blue-100
-                      text-blue-700 text-xs
-                      font-semibold rounded-xl
-                      transition-colors">
+                    className="mt-4 w-full py-2
+                      bg-blue-600 hover:bg-blue-700
+                      text-white text-xs font-semibold
+                      rounded-lg transition-colors">
                     Reserve
                   </button>
                 )}
               </div>
             ))}
           </div>
-
-          {!loadingBooks
-            && books.length === 0 && (
-            <div className="bg-white rounded-2xl
-              border border-slate-100 shadow-sm
-              p-12 text-center">
-              <Library size={40}
-                className="text-slate-200
-                  mx-auto mb-3" />
-              <p className="text-slate-400 text-sm">
-                {search
-                  ? `No books found for "${search}"`
-                  : 'No books in library yet'}
-              </p>
-            </div>
-          )}
         </div>
       )}
 
       {/* Issued Tab */}
       {tab === 'issued' && (
-        <IssuedBooksTab
-          isAdmin={isAdmin || isLibrarian}
-          userId={user?.id}
+        <IssuedBooksPanel
+          isAdmin={isAdmin}
+          isLibrarian={isLibrarian}
+          user={user}
           queryClient={queryClient}
         />
       )}
@@ -326,22 +306,19 @@ export default function LibraryPage() {
               Overdue Books
             </h2>
           </div>
-          {overdueBooks.length === 0 && (
-            <div className="p-12 text-center">
-              <Clock size={40}
-                className="text-slate-200
-                  mx-auto mb-3" />
-              <p className="text-slate-400 text-sm">
-                No overdue books
-              </p>
-            </div>
-          )}
           <div className="divide-y divide-slate-50">
+            {overdueBooks.length === 0 && (
+              <div className="text-center py-12
+                text-slate-400 text-sm">
+                No overdue books
+              </div>
+            )}
             {overdueBooks.map(issue => (
               <div key={issue.id}
-                className="flex items-center
-                  gap-4 p-4">
-                <AlertCircle size={20}
+                className="flex items-center gap-4
+                  p-4">
+                <AlertCircle
+                  size={18}
                   className="text-red-500
                     flex-shrink-0" />
                 <div className="flex-1 min-w-0">
@@ -350,38 +327,19 @@ export default function LibraryPage() {
                     {issue.bookTitle}
                   </p>
                   <p className="text-xs
-                    text-slate-400">
-                    {issue.userName} •
+                    text-slate-500 mt-0.5">
+                    User: {issue.userName}
+                    {' • '}
                     Due: {formatDate(issue.dueDate)}
                   </p>
                 </div>
-                {issue.fineAmount > 0 && (
-                  <span className="text-sm
-                    font-bold text-red-600">
-                    ₹{issue.fineAmount}
-                  </span>
-                )}
-                <button
-                  onClick={async () => {
-                    try {
-                      await libraryApi
-                        .returnBook(issue.id)
-                      queryClient.invalidateQueries(
-                        ['overdue-books'])
-                      toast.success('Book returned!')
-                    } catch (err) {
-                      toast.error('Return failed')
-                    }
-                  }}
-                  className="px-3 py-1.5
-                    bg-emerald-600
-                    hover:bg-emerald-700
-                    text-white text-xs
-                    font-semibold rounded-lg
-                    transition-colors
-                    flex-shrink-0">
-                  Return
-                </button>
+                <span className="text-xs
+                  font-semibold text-red-600
+                  bg-red-50 px-2.5 py-1
+                  rounded-lg">
+                  Fine:
+                  {' '}₹{issue.fineAmount || 0}
+                </span>
               </div>
             ))}
           </div>
@@ -405,6 +363,7 @@ export default function LibraryPage() {
           onSuccess={() => {
             setShowIssue(false)
             queryClient.invalidateQueries(['books'])
+            queryClient.invalidateQueries(['overdue-books'])
             toast.success('Book issued!')
           }}
         />
@@ -413,14 +372,15 @@ export default function LibraryPage() {
   )
 }
 
-function IssuedBooksTab({
-  isAdmin, userId, queryClient
+function IssuedBooksPanel({
+  isAdmin, isLibrarian, user, queryClient
 }) {
-  const { data: issued = [] } = useQuery({
-    queryKey: ['issued-books', userId],
+  const { data: userBooks = [] } = useQuery({
+    queryKey: ['issued-books-panel', user?.id],
     queryFn:  () =>
-      libraryApi.getUserBooks(userId)
+      libraryApi.getUserBooks(user?.id)
         .then(r => r.data?.data || []),
+    enabled: !isAdmin && !isLibrarian,
   })
 
   return (
@@ -431,70 +391,59 @@ function IssuedBooksTab({
         border-slate-100">
         <h2 className="text-base font-semibold
           text-slate-700">
-          {isAdmin
-            ? 'Currently Issued Books'
-            : 'My Issued Books'}
+          Issued Books
         </h2>
       </div>
-      {issued.length === 0 && (
-        <div className="p-12 text-center">
-          <BookOpen size={40}
-            className="text-slate-200 mx-auto mb-3" />
-          <p className="text-slate-400 text-sm">
-            No books currently issued
-          </p>
-        </div>
-      )}
       <div className="divide-y divide-slate-50">
-        {issued.map(issue => (
+        {userBooks.length === 0 && (
+          <div className="text-center py-12
+            text-slate-400 text-sm">
+            No issued books
+          </div>
+        )}
+        {userBooks.map(issue => (
           <div key={issue.id}
-            className="flex items-center
-              gap-4 p-4">
-            <div className="w-10 h-10 rounded-xl
-              bg-blue-50 flex items-center
-              justify-center flex-shrink-0">
-              <BookOpen size={18}
-                className="text-blue-600" />
-            </div>
+            className="flex items-center gap-4
+              p-4">
+            <Clock size={18}
+              className="text-slate-400
+                flex-shrink-0" />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold
-                text-slate-800 truncate">
+                text-slate-800">
                 {issue.bookTitle}
               </p>
-              <p className="text-xs text-slate-400">
-                Issued: {formatDate(issue.issueDate)}
-                {' • '}
+              <p className="text-xs
+                text-slate-500 mt-0.5">
                 Due: {formatDate(issue.dueDate)}
               </p>
             </div>
             <span className={`px-2.5 py-1
-              rounded-lg text-xs font-semibold
-              border flex-shrink-0
+              rounded-lg text-xs
+              font-semibold
               ${issue.status === 'OVERDUE'
-                ? 'bg-red-50 text-red-700 border-red-200'
-                : 'bg-blue-50 text-blue-700 border-blue-200'}`}>
+                ? 'bg-red-50 text-red-700'
+                : 'bg-blue-50 text-blue-700'}`}>
               {issue.status}
             </span>
-            {isAdmin && (
+            {(isAdmin || isLibrarian) && (
               <button
                 onClick={async () => {
                   try {
-                    await libraryApi
-                      .returnBook(issue.id)
-                    queryClient.invalidateQueries(
-                      ['issued-books'])
+                    await libraryApi.returnBook(issue.id)
+                    queryClient.invalidateQueries(['books'])
+                    queryClient.invalidateQueries(['overdue-books'])
                     toast.success('Book returned!')
                   } catch {
                     toast.error('Return failed')
                   }
                 }}
                 className="px-3 py-1.5
-                  border border-slate-200
-                  hover:bg-slate-50 text-slate-600
-                  text-xs font-medium rounded-lg
-                  transition-colors flex-shrink-0
-                  flex items-center gap-1">
-                <RotateCcw size={13} />
+                  bg-emerald-600 hover:bg-emerald-700
+                  text-white text-xs font-semibold
+                  rounded-lg transition-colors">
+                <RotateCcw size={12}
+                  className="inline mr-1" />
                 Return
               </button>
             )}

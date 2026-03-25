@@ -48,6 +48,16 @@ public class LibraryController {
             libraryService.searchBooks(query, page, size));
     }
 
+    @GetMapping("/books")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get all books")
+    public ResponseEntity<Page<BookDto>> getBooks(
+            @RequestParam(defaultValue = "0")  int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return ResponseEntity.ok(
+            libraryService.getAllBooks(page, size));
+    }
+
     @GetMapping("/books/available")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Get available books")

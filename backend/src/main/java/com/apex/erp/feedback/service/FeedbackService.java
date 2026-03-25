@@ -63,7 +63,7 @@ public class FeedbackService {
 
     @Transactional(readOnly = true)
     public List<FeedbackFormResponse> getAllForms() {
-        return formRepository.findAll()
+        return formRepository.findAllWithRelations()
             .stream()
             .map(this::safeFormResponse)
             .filter(Objects::nonNull)

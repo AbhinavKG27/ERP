@@ -3,6 +3,9 @@ import api from './axios'
 export const libraryApi = {
   addBook:      (data) =>
     api.post('/library/books', data),
+  getBooks:     (page = 0) =>
+    api.get('/library/books',
+      { params: { page } }),
   searchBooks:  (query, page = 0) =>
     api.get('/library/books/search',
       { params: { query, page } }),
