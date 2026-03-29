@@ -10,6 +10,7 @@ import com.apex.erp.module.library.mapper.LibraryMapper;
 import com.apex.erp.module.library.repository.*;
 import com.apex.erp.module.user.repository.UserRepository;
 import com.apex.erp.security.CustomUserDetails;
+import com.apex.erp.security.SecurityService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -37,6 +38,7 @@ public class LibraryService {
     private final DepartmentRepository  deptRepo;
     private final LibraryMapper         mapper;
     private final AppProperties         appProperties;
+    private final SecurityService       securityService;
 
     // ── Add book ──────────────────────────────────────────────
     @Transactional
@@ -113,11 +115,11 @@ public class LibraryService {
         }
 
         // Get current librarian
-        CustomUserDetails currentUser =
-            (CustomUserDetails) SecurityContextHolder
-                .getContext().getAuthentication().getPrincipal();
-        var librarian = userRepo.findById(currentUser.getId())
-            .orElseThrow();
+        Long currentUserId = securityService.getCurrentUserId();
+        var librarian = userRepo.findById(currentUserId)
+            .orElseThrow(() -> new ResourceNotFoundException(
+                "User", "id", currentUserId));
+
 
         BookIssue issue = BookIssue.builder()
             .book(book)

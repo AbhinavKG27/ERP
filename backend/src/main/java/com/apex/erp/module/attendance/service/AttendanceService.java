@@ -15,8 +15,10 @@ import com.apex.erp.module.student.entity.Student;
 import com.apex.erp.module.student.repository.StudentRepository;
 import com.apex.erp.module.user.repository.UserRepository;
 import com.apex.erp.security.CustomUserDetails;
+import com.apex.erp.security.SecurityService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +44,7 @@ public class AttendanceService {
     private final UserRepository               userRepo;
     private final AttendanceMapper             mapper;
     private final AppProperties                appProperties;
+    private final SecurityService              securityService;
 
     // ── Create session ────────────────────────────────────────
     @Transactional
@@ -89,14 +92,13 @@ public class AttendanceService {
                 "SESSION_FINALIZED",
                 "Cannot modify a finalized session");
         }
-
-        CustomUserDetails currentUser =
-            (CustomUserDetails) SecurityContextHolder
-                .getContext().getAuthentication().getPrincipal();
-
+        
+        Long currentUserId = securityService.getCurrentUserId();
         var markedByUser = userRepo
-            .findById(currentUser.getId())
-            .orElseThrow();
+            .findById(currentUserId)
+            .orElseThrow(() -> new ResourceNotFoundException(
+                "User", "id", currentUserId));
+
 
         // Save attendance for each student
         for (Map.Entry<Long, String> entry :

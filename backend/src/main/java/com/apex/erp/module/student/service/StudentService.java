@@ -20,11 +20,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Locale;
+import java.util.Set;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class StudentService {
+
+    private static final Set<String> ALLOWED_STATUSES =
+        Set.of("ACTIVE", "INACTIVE", "SUSPENDED", "DETAINED", "GRADUATED");
 
     private final StudentRepository studentRepository;
     private final UserRepository    userRepository;
@@ -129,12 +135,26 @@ public class StudentService {
     @Transactional
     public StudentDto updateStudentStatus(
             Long id, String status) {
+        if (status == null || status.isBlank()) {
+            throw new BusinessRuleException(
+                "INVALID_STATUS",
+                "Student status must not be blank");
+        }
+
+        String normalizedStatus = status
+            .trim()
+            .toUpperCase(Locale.ROOT);
+        if (!ALLOWED_STATUSES.contains(normalizedStatus)) {
+            throw new BusinessRuleException(
+                "INVALID_STATUS",
+                "Unsupported student status: " + status);
+        }
         Student student = studentRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException(
                 "Student", "id", id));
-        student.setStatus(status);
-        if ("DETAINED".equals(status))
-            student.setIsDetained(true);
+                
+        student.setStatus(normalizedStatus);
+        student.setIsDetained("DETAINED".equals(normalizedStatus));
         return studentMapper.toDto(
             studentRepository.save(student));
     }
